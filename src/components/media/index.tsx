@@ -17,12 +17,7 @@ export default function VideoRoom(props: IVideoRoomProps) {
 	useEffect(() => {
 		if (myStream) {
 			import("peerjs").then(({ default: Peer }) => {
-				const myPeer = new Peer(undefined, {
-					host: "boundary-chat.herokuapp.com",
-					port: 443,
-					path: "/media-chat",
-					secure: true,
-				});
+				const myPeer = new Peer();
 				myPeer.on("open", (id) => {
 					socket.emit("join-room", roomID, id);
 				});
@@ -51,7 +46,7 @@ export default function VideoRoom(props: IVideoRoomProps) {
 	const getMyMediaStream = async () => {
 		const myMedia = await navigator.mediaDevices.getUserMedia({
 			video: true,
-			audio: false,
+			audio: true,
 		});
 		setMyStream(myMedia);
 	};
