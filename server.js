@@ -1,4 +1,5 @@
-const http = require('http');
+const fs = require('fs')
+const https = require('https');
 const next = require("next");
 const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== "production";
@@ -7,10 +8,19 @@ const handle = app.getRequestHandler();
 const express = require("express");
 const { ExpressPeerServer } = require('peer');
 
+
+// option for https server certificates
+const options = {
+	key: fs.readFileSync('/etc/letsencrypt/live/homesweethome.cf/privkey.pem'),
+	cert: fs.readFileSync('/etc/letsencrypt/live/homesweethome.cf/cert.pem'),
+	ca: fs.readFileSync('/etc/letsencrypt/live/homesweethome.cf/chain.pem'),
+	requestCert: false,
+	rejectUnauthorized: false,
+}
 // nextjs routing
 app.prepare().then(() => {
 	const expressApp = express();
-	const server = http.createServer(expressApp);
+	const server = https.createServer(options, expressApp);
 	const io = require('socket.io')(server);
 
 
@@ -57,6 +67,6 @@ app.prepare().then(() => {
 	})
 	// listen for secured http connection
 	server.listen(port, () => {
-		console.log(`> Server Ready`);
+		console.log(`> Https Server Ready`);
 	});
 });
