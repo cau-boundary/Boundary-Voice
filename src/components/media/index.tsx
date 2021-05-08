@@ -18,7 +18,9 @@ export default function VideoRoom(props: IVideoRoomProps) {
 		if (myStream) {
 			import("peerjs").then(({ default: Peer }) => {
 				const myPeer = new Peer(undefined, {
+					host: "boundary-chat.herokuapp.com",
 					port: 443,
+					path: "/media-chat",
 					secure: true,
 				});
 				myPeer.on("open", (id) => {
