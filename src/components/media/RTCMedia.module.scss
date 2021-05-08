@@ -1,0 +1,8 @@
+.myVideo {
+	width: 400px;
+	height: 300px;
+	object-fit: cover;
+	transform: rotateY(180deg);
+	-webkit-transform: rotateY(180deg); /* Safari and Chrome */
+	-moz-transform: rotateY(180deg); /* Firefox */
+}

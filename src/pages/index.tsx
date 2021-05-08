@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import Link from "next/link";
 import { Contact, Footer, Header, Menu } from "@src/components/common";
 
 export default function Home() {
@@ -16,7 +17,7 @@ export default function Home() {
 				<section id="banner" className="major">
 					<div className="inner">
 						<header className="major">
-							<h1>Hi, my name is Forty</h1>
+							<h1>Hi, my name is Woodi</h1>
 						</header>
 						<div className="content">
 							<p>
@@ -45,8 +46,8 @@ export default function Home() {
 							</span>
 							<header className="major">
 								<h3>
-									<a href="landing.html" className="link">
-										Aliquam
+									<a href="/media-room" className="link">
+										Join Media Chat
 									</a>
 								</h3>
 								<p>Ipsum dolor sit amet</p>
@@ -58,8 +59,8 @@ export default function Home() {
 							</span>
 							<header className="major">
 								<h3>
-									<a href="landing.html" className="link">
-										Tempus
+									<a href="/voice-room" className="link">
+										Join Voice Chat
 									</a>
 								</h3>
 								<p>feugiat amet tempus</p>
@@ -71,8 +72,8 @@ export default function Home() {
 							</span>
 							<header className="major">
 								<h3>
-									<a href="landing.html" className="link">
-										Magna
+									<a href="/landing" className="link">
+										Landing Page
 									</a>
 								</h3>
 								<p>Lorem etiam nullam</p>
@@ -84,7 +85,7 @@ export default function Home() {
 							</span>
 							<header className="major">
 								<h3>
-									<a href="landing.html" className="link">
+									<a href="/landing" className="link">
 										Ipsum
 									</a>
 								</h3>
@@ -97,7 +98,7 @@ export default function Home() {
 							</span>
 							<header className="major">
 								<h3>
-									<a href="landing.html" className="link">
+									<a href="/landing" className="link">
 										Consequat
 									</a>
 								</h3>
@@ -110,7 +111,7 @@ export default function Home() {
 							</span>
 							<header className="major">
 								<h3>
-									<a href="landing.html" className="link">
+									<a href="/landing" className="link">
 										Etiam
 									</a>
 								</h3>
@@ -136,7 +137,7 @@ export default function Home() {
 							</p>
 							<ul className="actions">
 								<li>
-									<a href="landing.html" className="button next">
+									<a href="/landing" className="button next">
 										Get Started
 									</a>
 								</li>
