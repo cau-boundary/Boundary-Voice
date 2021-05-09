@@ -48,8 +48,8 @@ export default function VideoRoom(props: IVideoRoomProps) {
 
 	const getMyMediaStream = async () => {
 		const myMedia = await navigator.mediaDevices.getUserMedia({
-			video: false,
-			audio: true,
+			video: true,
+			audio: false,
 		});
 		setMyStream(myMedia);
 	};
