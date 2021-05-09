@@ -1,5 +1,6 @@
 const http = require('http');
 const next = require("next");
+const cors = require('cors');
 const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
@@ -16,12 +17,12 @@ app.prepare().then(() => {
 
 	let connected = [];
 	const expressPeerServer = ExpressPeerServer(server,{
-		allow_discovery: true,
 		debug:true
 	});
 
 	// express + peerjs setting
 	expressApp.use('/media-chat',expressPeerServer);
+	expressApp.use(cors());
 
 
 	// when user connected to peer server, save that id to connected array

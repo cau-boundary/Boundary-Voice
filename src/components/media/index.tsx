@@ -10,7 +10,6 @@ export interface IVideoRoomProps {
 export default function VideoRoom(props: IVideoRoomProps) {
 	const { roomID } = props;
 	const socket = useContext(SocketContext);
-	const [myPeer, setMyPeer] = useState(undefined);
 	const [myStream, setMyStream] = useState<MediaStream>(undefined);
 	const [otherStreams, setOtherStreams] = useState<MediaStream[]>([]);
 
@@ -18,9 +17,9 @@ export default function VideoRoom(props: IVideoRoomProps) {
 		if (myStream) {
 			import("peerjs").then(({ default: Peer }) => {
 				const myPeer = new Peer(undefined, {
+					path: "/media-chat",
 					host: "/",
 					port: 443,
-					path: "/media-chat",
 				});
 				myPeer.on("open", (id) => {
 					socket.emit("join-room", roomID, id);
@@ -64,7 +63,6 @@ export default function VideoRoom(props: IVideoRoomProps) {
 			<div className={styles.videoGrid}>
 				<RTCMedia mediaStream={myStream} />
 				{otherStreams.map((mediaStream, index) => {
-					console.log(otherStreams);
 					return <RTCMedia key={index} mediaStream={mediaStream} />;
 				})}
 			</div>
