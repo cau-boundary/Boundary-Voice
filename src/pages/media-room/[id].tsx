@@ -2,7 +2,7 @@ import React from "react";
 import dynamic from "next/dynamic";
 
 const DynamicComponentWithNoSSR = dynamic(
-	() => import("@src/components/media"),
+	() => import("@src/components/webRTC"),
 	{
 		ssr: false,
 	},

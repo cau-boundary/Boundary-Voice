@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import styles from "@src/components/media/RTCMedia.module.scss";
+
+import styles from "@src/components/webRTC/rtcMedia/index.module.scss";
 
 export interface IRTCMediaProps {
 	mediaStream: MediaStream;
@@ -15,11 +16,6 @@ export default function RTCMedia(props: IRTCMediaProps) {
 	}, [mediaStream]);
 
 	return (
-		<video
-			className={styles.myVideo}
-			ref={viewRef}
-			autoPlay
-			playsInline
-		></video>
+		<video className={styles.video} ref={viewRef} autoPlay playsInline></video>
 	);
 }

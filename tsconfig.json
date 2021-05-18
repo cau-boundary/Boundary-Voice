@@ -26,7 +26,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "src/hooks/useLocalStream.js", "src/hooks/useWebSocket.js", "src/hooks/useUserMedia.js", "src/hooks/useStream.ts", "src/hooks/useRemoteStream.js", "src/hooks/usePeer.js", "src/components/webRTC/localStream/localStream.js"  ],
   "exclude": [
     "node_modules"
   ]
