@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 
-import { getRandomId } from "../../public/js/idutil";
+import { SocketContext } from "./useWebSocket";
+import { getRandomId } from "../../public/js/randomid";
 
 const audioOnlyConfig = { audio: true, video: false };
 const userMediaConfig = {
@@ -14,32 +15,36 @@ const localConfig = {
     host: "localhost",
 	port: 3000,
 	path: "/media-chat",
-    secure: true,
+    // secure: true,
     config,
 	debug: 3,
 };
 
-export default function usePeer(addRemoteStream, removeRemoteStream) {
+export default function usePeer(addRemoteStream, removeRemoteStream, roomId) {
+    const peers = {}
+    const socket = useContext(SocketContext);
     const [myPeer, setPeer] = useState(null);
     const [myPeerID, setMyPeerID] = useState(null);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const cleanUp = () => {
-        if (myPeer) {
-            myPeer.disconnect();
-            myPeer.destroy();
-        }
-        setPeer(null);
-        setMyPeerID(null);
-    }
+    const cleanUp = useCallback(
+        ()=>{
+            if (myPeer) {
+                myPeer.disconnect();
+                myPeer.destroy();
+            }
+            setPeer(null);
+            setMyPeerID(null);
+        },[]
+    )
 
     useEffect(() => {
         import('peerjs').then(({default:Peer}) => {
             const peer = myPeer ? myPeer : new Peer(String(getRandomId()), localConfig);
 
-            peer.on('open', () => {
+            peer.on('open', (id) => {
                 setPeer(peer);
                 setMyPeerID(peer.id);
+                socket.emit("join-room", roomId, id);
             })
 
             peer.on('call', (call) => {
@@ -64,6 +69,18 @@ export default function usePeer(addRemoteStream, removeRemoteStream) {
                             console.log(error);
                             removeRemoteStream(call.peer);
                         });
+
+                        socket.on("user-connected", (userId) => {
+                            const call = myPeer.call(userId, stream);
+                            // add other users media stream
+                            call.on("stream", (remoteStream) => {
+                                addRemoteStream(remoteStream, call.peer);
+                            });
+                            peers[userId] = call;
+                        });
+                        socket.on("user-disconnected", (userId) => {
+                            if (peers[userId]) peers[userId].close();
+                        });
                     }).catch(error => { console.log(error); });
             });
 
@@ -87,7 +104,10 @@ export default function usePeer(addRemoteStream, removeRemoteStream) {
         return () => {
             cleanUp()
         }
-    }, [addRemoteStream, cleanUp, myPeer, removeRemoteStream])
+    }, [])
 
     return [myPeer, myPeerID] as const;
 }
+
+
+

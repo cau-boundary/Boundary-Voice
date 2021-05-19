@@ -1,7 +1,7 @@
 import React, { ReactEventHandler, useCallback, useRef } from 'react';
 
 export default function useStream() {
-    const videoRef = useRef<HTMLVideoElement>(null);
+    const videoRef = useRef(null);
 
     const setStream = useCallback(
         (stream) => {

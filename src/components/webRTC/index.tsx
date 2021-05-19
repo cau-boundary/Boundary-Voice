@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useRemoteStream, useUserMedia } from "@src/hooks";
+import { usePeer, useRemoteStream, useUserMedia } from "@src/hooks";
 
 import RTCMedia from "@src/components/webRTC/rtcMedia";
 import { SocketContext } from "@src/util/websocket";
@@ -18,7 +18,7 @@ const config = { iceServers: [{ urls: ["stun:stun.l.google.com:19302"] }] };
 
 const localConfig = {
 	host: "/",
-	port: 3000,
+	port: 443,
 	path: "/media-chat",
 	config,
 	// secure: true,
@@ -28,68 +28,83 @@ const localConfig = {
 export default function VideoRoom(props: IVideoRoomProps) {
 	const { roomId } = props;
 	const socket = useContext(SocketContext);
+	const peers = {};
 	const localStream = useUserMedia();
 	const [
 		remoteStreams,
 		addRemoteStream,
 		removeRemoteStream,
 	] = useRemoteStream();
-	// const [myPeer, myPeerID] = usePeer(addRemoteStream, removeRemoteStream);
+	// const [myPeer, myPeerID] = usePeer(addRemoteStream, removeRemoteStream,roomId);
 
 	useEffect(() => {
-		if (localStream && socket) {
+		if (localStream) {
 			import("peerjs").then(({ default: Peer }) => {
-				const myPeer = new Peer(undefined, {
-					host: "localhost",
-					port: 3000,
-					path: "/media-chat",
-					debug: 1,
-				});
+				const myPeer = new Peer(undefined, localConfig);
+
 				myPeer.on("open", (id) => {
-					console.log("peer initialized");
 					socket.emit("join-room", roomId, id);
 				});
-				myPeer.on("call", (caller) => {
-					console.log("get call from caller");
-					caller.answer(localStream);
-					caller.on("stream", (remoteStream) => {
-						addRemoteStream(remoteStream, caller.peer);
+
+				myPeer.on("call", (call) => {
+					call.answer(localStream);
+					call.on("stream", (remoteStream) => {
+						addRemoteStream(remoteStream, call.peer);
+					});
+
+					call.on("close", () => {
+						console.log("The call has ended");
+						removeRemoteStream(call.peer);
+					});
+
+					call.on("error", (error) => {
+						console.log(error);
+						removeRemoteStream(call.peer);
 					});
 				});
+
 				myPeer.on("disconnected", () => {
 					console.log("Peer disconnected");
+					myPeer.disconnect();
+					myPeer.destroy();
 				});
+
 				myPeer.on("close", () => {
-					console.log("peer closed remotely");
+					console.log("Peer closed remotetly");
+					myPeer.disconnect();
+					myPeer.destroy();
 				});
+
 				myPeer.on("error", (error) => {
 					console.log("peer error", error);
+					myPeer.disconnect();
+					myPeer.destroy();
 				});
 
 				socket.on("user-connected", (userID) => {
-					console.log("user-connected");
-					const callee = myPeer.call(userID, localStream);
-					callee.on("stream", (remoteStream) => {
-						addRemoteStream(remoteStream, callee.peer);
+					//call.peer == userID
+					const call = myPeer.call(userID, localStream);
+					console.log(call);
+					// add other users media stream
+					call.on("stream", (remoteStream) => {
+						addRemoteStream(remoteStream, call.peer);
 					});
-					callee.on("close", () => {
-						console.log("call closed");
-						removeRemoteStream(callee.peer);
-						callee.close();
-					});
-					callee.on("error", (error) => {
-						console.log("call error", error);
-						removeRemoteStream(callee.peer);
-						callee.close();
-					});
+					peers[userID] = call;
 				});
-				socket.on("user-disconnected", (usedID) => {
-					console.log("stream should be removed");
-					// 	if (peers[userID]) peers[userID].close();
+				socket.on("user-disconnected", (userID) => {
+					console.log("user-disconnected");
+					console.log(userID);
+					removeRemoteStream(userID);
+					if (peers[userID]) peers[userID].close();
 				});
 			});
 		}
-	}, [addRemoteStream, localStream, removeRemoteStream, roomId, socket]);
+	}, [localStream]);
+
+	const onButtonClick = (e) => {
+		e.preventDefault();
+		console.log(e);
+	};
 
 	return (
 		<div>
@@ -99,6 +114,7 @@ export default function VideoRoom(props: IVideoRoomProps) {
 					return <RTCMedia key={index} mediaStream={mediaStream.stream} />;
 				})}
 			</div>
+			<button onClick={onButtonClick}>close call</button>
 		</div>
 	);
 }
