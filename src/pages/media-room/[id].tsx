@@ -9,15 +9,15 @@ const DynamicComponentWithNoSSR = dynamic(
 );
 
 export interface IVideoChatPageProps {
-	roomID: any;
+	roomId: any;
 }
 
 export default function VideoChatPage(props: IVideoChatPageProps) {
-	const { roomID } = props;
+	const { roomId } = props;
 
 	return (
 		<>
-			<DynamicComponentWithNoSSR roomID={roomID} />
+			<DynamicComponentWithNoSSR roomId={roomId} />
 		</>
 	);
 }
